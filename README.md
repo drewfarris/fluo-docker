@@ -26,7 +26,7 @@ docker build -t fluo-docker .
 After the image is built, start a container running the bash shell:
 
 ```
-docker run -it -P fluo-docker bash
+docker run -it --memory-swappiness=0 -p 22222:22/tcp fluo-docker bash
 ```
 
 In the resulting shell, start sshd and run fluo-dev setup. The various components
@@ -41,23 +41,18 @@ service sshd start
 Once everything has started, you'll need a way to connect to the various
 web-based user interface components to monitor what's going on. The easiest
 way to do this is to connect to the docker container via SSH with a socks proxy
-in place. To do this, we need to figure out what port the SSH server on the
-container is mapped to externally.
+in place. In the run command above, we mapped port 22 on the container to
+port 22222 on the host. In the shell that started with docker-run, you'll need
+to append your ssh public key to /root/.ssh/authorized_keys
 
+Once that's done, all that's left is to determine the ip of the machine
+we're running on and fire up a socks proxy based on that
 ```
-$> docker ps
-CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                                                                                                                                                                            NAMES
-05aa7d305b40        fluo-docker         "/bin/bash"         2 hours ago         Up 2 hours          0.0.0.0:32774->22/tcp, 0.0.0.0:32773->3000/tcp, 0.0.0.0:32772->8083/tcp, 0.0.0.0:32771->8088/tcp, 0.0.0.0:32770->18080/tcp, 0.0.0.0:32769->50070/tcp, 0.0.0.0:32768->50095/tcp   grave_newton
-```
-
-In this case, port 32774 on the docker VM is mapped to port 22 on the container.
-On the mac, we'll need to forward port 32772 from the host to the docker vm.
-For virtualbox, this will look something like the following:
 
 ```
 docker-machine ip big
 192.168.99.100
-ssh -D 12345 root@192.168.99.100 -p 3277
+ssh -N -f -D 12345 root@192.168.99.100 -p 222222
 ```
 
 Then you'll need to set up foxyproxy or your browser plugin of choice to use
