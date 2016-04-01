@@ -44,7 +44,7 @@ RUN curl http://mirrors.ibiblio.org/apache/maven/maven-3/${MAVEN_VERSION}/binari
 
 # setup fluo-dev & download dependencies
 RUN cd /root && \
-     git clone -b download-refactor https://github.com/fluo-io/fluo-dev.git && \
+     git clone https://github.com/fluo-dev/fluo-dev.git && \
      cd fluo-dev/conf && cp env.sh.example env.sh && \
      perl -pi -e 's/SETUP_METRICS=false/SETUP_METRICS=true/' env.sh && \
      perl -pi -e 's(APACHE_MIRROR=.*$)(APACHE_MIRROR=http://apache.arvixe.com/)' env.sh && \
