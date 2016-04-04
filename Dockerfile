@@ -53,7 +53,6 @@ RUN cd /root && \
      echo 'PATH=\${FLUO_HOME}/bin:\${PATH}' >> /root/.bashrc && \
      cd ../bin/ && ./fluo-dev download ; exit 0
 
-RUN
 EXPOSE 50070 8088 50095 18080 3000 8083 22
 
 CMD /bin/bash
