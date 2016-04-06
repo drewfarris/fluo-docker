@@ -42,16 +42,19 @@ RUN curl http://mirrors.ibiblio.org/apache/maven/maven-3/${MAVEN_VERSION}/binari
     echo "export MAVEN_HOME=/usr/share/apache-maven-\${MAVEN_VERSION}" >> /root/.bashrc && \
     echo "PATH=\${MAVEN_HOME}/bin:\${PATH}" >> /root/.bashrc
 
-# setup fluo-dev & download dependencies
+# checkout fluo-dev, configure and download dependencies
 RUN cd /root && \
-     git clone https://github.com/fluo-dev/fluo-dev.git && \
+     git clone https://github.com/fluo-io/fluo-dev.git && \
      cd fluo-dev/conf && cp env.sh.example env.sh && \
      perl -pi -e 's/SETUP_METRICS=false/SETUP_METRICS=true/' env.sh && \
-     perl -pi -e 's(APACHE_MIRROR=.*$)(APACHE_MIRROR=http://apache.arvixe.com/)' env.sh && \
-     grep 'export FLUO_VERSION' env.sh >> /root/.bashrc && \
-     echo 'export FLUO_HOME=/root/fluo-dev/install/fluo-\${FLUO_VERSION}' >> /root/.bashrc && \
-     echo 'PATH=\${FLUO_HOME}/bin:\${PATH}' >> /root/.bashrc && \
-     cd ../bin/ && ./fluo-dev download ; exit 0
+     perl -pi -e 's(APACHE_MIRROR=.*$)(APACHE_MIRROR=http://www-us.apache.org/dist/)' env.sh && \
+     cd ../bin/ && ./fluo-dev download
+
+# setup root bashrc
+RUN cd /root && \
+     grep 'export FLUO_VERSION' /root/fluo-dev/conf/env.sh >> /root/.bashrc && \
+     echo 'export FLUO_HOME=/root/fluo-dev/install/fluo-${FLUO_VERSION}' >> /root/.bashrc && \
+     echo 'eval "$(/root/fluo-dev/bin/fluo-dev env)"' >> /root/.bashrc 
 
 EXPOSE 50070 8088 50095 18080 3000 8083 22
 
